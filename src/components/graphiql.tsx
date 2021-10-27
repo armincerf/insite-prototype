@@ -1,42 +1,39 @@
-import GraphiQL from 'graphiql';
-import GraphiQLExplorer from 'graphiql-explorer';
-import { getIntrospectionQuery, buildClientSchema } from "graphql"
-import 'graphiql/graphiql.min.css';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import GraphiQL from "graphiql";
+import GraphiQLExplorer from "graphiql-explorer";
+import { getIntrospectionQuery, buildClientSchema } from "graphql";
+import "graphiql/graphiql.min.css";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 async function fetchGraphQlSchema(fetcher: import("graphiql").Fetcher) {
   const result = await fetcher({
     query: getIntrospectionQuery(),
   } as never);
 
-  const schema = buildClientSchema(
-    (result as { data: import("graphql").IntrospectionQuery }).data,
-  );
+  const schema = buildClientSchema((result as { data: import("graphql").IntrospectionQuery }).data);
   return schema;
 }
 
-const graphQLFetcher: import("graphiql").Fetcher = async (graphQLParams) => {
-  const queryParams = new URLSearchParams(window.location.search);
-  const endpoint = queryParams.get('url') ?? '/_site/graphql';
-  const data = await fetch(
-    endpoint,
-    {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(graphQLParams),
-      credentials: 'include',
-    }
-  );
-  return data.json().catch(() => console.error('error fetching from ' + endpoint, data));
-}
+type Props = {
+  endpoint: string;
+};
 
-export const GraphiQLConsole = () => {
+export const GraphiQLConsole = ({ endpoint }: Props) => {
   const [query, setQuery] = useState<string | undefined>();
   const [schema, setSchema] = useState<import("graphql").GraphQLSchema>();
   const [explorerIsOpen, setExplorerIsOpen] = useState(true);
+  const isSiteUrl = endpoint.includes("localhost");
+  const graphQLFetcher: import("graphiql").Fetcher = async (graphQLParams) => {
+    const data = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(graphQLParams),
+      credentials: isSiteUrl ? "include" : "same-origin",
+    });
+    return data.json().catch(() => console.error("error fetching from " + endpoint, data));
+  };
 
   const refGq = useRef<GraphiQL | null>(null);
 
@@ -49,17 +46,18 @@ export const GraphiQLConsole = () => {
   }, []);
 
   useEffect(() => {
-    fetchGraphQlSchema(graphQLFetcher).then((s) => setSchema(s)).catch(error => console.log('ERROR'));
-  }, []);
+    setQuery('');
+    fetchGraphQlSchema(graphQLFetcher)
+      .then((s) => setSchema(s))
+      .catch((error) => console.log("ERROR"));
+  }, [endpoint]);
   return (
     <div className={`graphiql-container`}>
       <GraphiQLExplorer
         schema={schema}
         query={query}
         onEdit={handleEditQuery}
-        onRunOperation={(operationName?: string) =>
-          refGq.current?.handleRunQuery(operationName)
-        }
+        onRunOperation={(operationName?: string) => refGq.current?.handleRunQuery(operationName)}
         explorerIsOpen={explorerIsOpen}
         onToggleExplorer={handleToggleExplorer}
       />

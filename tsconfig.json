@@ -21,7 +21,7 @@
   },
   "include": [
     "src"
-  ],
+, "graphiql.d.ts"  ],
   "exclude": [
     "node_modules"
   ]

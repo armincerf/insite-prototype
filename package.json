@@ -9,12 +9,26 @@
     "postinstall": "husky install"
   },
   "dependencies": {
+    "@headlessui/react": "^1.4.1",
+    "@heroicons/react": "^1.0.5",
+    "@monaco-editor/react": "^4.3.1",
+    "@tailwindcss/typography": "^0.4.1",
+    "classnames": "^2.2.5",
+    "color2k": "^1.2.4",
+    "daisyui": "^1.16.0",
     "graphiql": "^1.4.2",
     "graphiql-explorer": "^0.6.3",
     "graphql": "^15.6.1",
+    "graphql-language-service": "^3.1.4",
+    "graphql-zeus": "^3.0.0",
+    "graphsource": "^2.0.5",
+    "monaco-editor": "^0.29.1",
     "next": "latest",
+    "re-resizable": "^6.9.1",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "typestyle": "^2.1.0",
+    "unstated-next": "^1.1.0"
   },
   "devDependencies": {
     "@types/react": "^17.0.32",
